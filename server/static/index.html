@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AegisShield EDR - Central Management Console</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>AegisShield</h2>
+          <span class="badge-status">EDR v1.0 Enterprise</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="overview">
+          <span class="nav-icon">📊</span> Overview
+        </button>
+        <button class="nav-item" data-tab="endpoints">
+          <span class="nav-icon">💻</span> Endpoints Fleet
+        </button>
+        <button class="nav-item" data-tab="threats">
+          <span class="nav-icon">🚨</span> Threat Incidents
+        </button>
+        <button class="nav-item" data-tab="quarantine">
+          <span class="nav-icon">🔒</span> Quarantine Vault
+        </button>
+        <button class="nav-item" data-tab="policies">
+          <span class="nav-icon">⚙️</span> Policy & Rules
+        </button>
+        <button class="nav-item" data-tab="audit">
+          <span class="nav-icon">📋</span> Audit & Reports
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-health">
+          <span class="status-indicator online"></span>
+          <span>Central Engine: Connected</span>
+        </div>
+        <div class="office-count" id="office-summary">Managed Offices: 2</div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-title">
+          <h1 id="page-title">Fleet Security Overview</h1>
+          <p class="subtitle" id="page-subtitle">Real-time status across multi-office Windows 10 & 11 workstations</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-secondary" onclick="refreshData()">
+            <span class="refresh-icon">🔄</span> Refresh Telemetry
+          </button>
+          <button class="btn btn-primary" onclick="showQuickScanModal()">
+            <span>⚡</span> Remote Fleet Quick Scan
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: OVERVIEW -->
+      <section id="tab-overview" class="tab-content active">
+        <!-- Stat Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">Total Endpoints</span>
+              <span class="metric-badge primary">50-100 Ready</span>
+            </div>
+            <div class="metric-value" id="stat-total-endpoints">0</div>
+            <div class="metric-footer" id="stat-office-breakdown">Loading offices...</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">Online & Protected</span>
+              <span class="metric-badge success">Active</span>
+            </div>
+            <div class="metric-value text-success" id="stat-online-endpoints">0</div>
+            <div class="metric-footer">Real-time heuristics enabled</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">Total Threats Intercepted</span>
+              <span class="metric-badge warning">Logged</span>
+            </div>
+            <div class="metric-value text-danger" id="stat-total-threats">0</div>
+            <div class="metric-footer" id="stat-critical-threats">0 critical alerts</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">Attention Required</span>
+              <span class="metric-badge alert">Action Needed</span>
+            </div>
+            <div class="metric-value text-warning" id="stat-attention-required">0</div>
+            <div class="metric-footer">Offline or unprotected PCs</div>
+          </div>
+        </div>
+
+        <!-- Protection Engines Status -->
+        <div class="section-box">
+          <div class="box-header">
+            <h3>Defensive Protection Stack</h3>
+            <span class="badge-status">Windows 10/11 Architecture</span>
+          </div>
+          <div class="engines-grid">
+            <div class="engine-badge active">
+              <div class="engine-icon">🛡️</div>
+              <div class="engine-info">
+                <h4>Signature & YARA Engine</h4>
+                <p>SHA-256 + Byte Stream Pattern Matching</p>
+              </div>
+              <span class="status-pill status-active">ACTIVE</span>
+            </div>
+            <div class="engine-badge active">
+              <div class="engine-icon">⚡</div>
+              <div class="engine-info">
+                <h4>Real-Time File System Guard</h4>
+                <p>Windows ReadDirectoryChangesW + Watchdog</p>
+              </div>
+              <span class="status-pill status-active">ACTIVE</span>
+            </div>
+            <div class="engine-badge active">
+              <div class="engine-icon">🪤</div>
+              <div class="engine-info">
+                <h4>Ransomware Canary Tripwire</h4>
+                <p>Decoy traps + High-Entropy Burst Kill</p>
+              </div>
+              <span class="status-pill status-active">ACTIVE</span>
+            </div>
+            <div class="engine-badge active">
+              <div class="engine-icon">🔌</div>
+              <div class="engine-info">
+                <h4>USB & Removable Storage</h4>
+                <p>Auto-insertion inspection & Autorun Defense</p>
+              </div>
+              <span class="status-pill status-active">ACTIVE</span>
+            </div>
+            <div class="engine-badge active">
+              <div class="engine-icon">🌐</div>
+              <div class="engine-info">
+                <h4>Network & Firewall Guard</h4>
+                <p>C2 IP containment & socket auditing</p>
+              </div>
+              <span class="status-pill status-active">ACTIVE</span>
+            </div>
+            <div class="engine-badge active">
+              <div class="engine-icon">🗄️</div>
+              <div class="engine-info">
+                <h4>Secure Quarantine Vault</h4>
+                <p>Neutralized storage + SHA-256 integrity restore</p>
+              </div>
+              <span class="status-pill status-active">ACTIVE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Incidents Table -->
+        <div class="section-box">
+          <div class="box-header">
+            <h3>Recent Intercepted Incidents</h3>
+            <button class="btn btn-sm btn-secondary" onclick="switchTab('threats')">View Full History</button>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Endpoint</th>
+                  <th>Threat Name</th>
+                  <th>Severity</th>
+                  <th>Detection Method</th>
+                  <th>Remediation</th>
+                  <th>File / Indicator</th>
+                </tr>
+              </thead>
+              <tbody id="overview-incidents-body">
+                <tr><td colspan="7" class="empty-state">No active threats detected. Fleet is clean.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: ENDPOINTS -->
+      <section id="tab-endpoints" class="tab-content">
+        <div class="toolbar">
+          <div class="search-box">
+            <input type="text" id="endpoint-search" placeholder="Filter by hostname, IP, or Office..." oninput="filterEndpoints()">
+          </div>
+          <div class="filter-actions">
+            <select id="office-filter" onchange="filterEndpoints()">
+              <option value="">All Offices</option>
+              <option value="Headquarters">Headquarters</option>
+              <option value="Branch Office Alpha">Branch Office Alpha</option>
+              <option value="Branch Office Beta">Branch Office Beta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Hostname</th>
+                <th>IP Address</th>
+                <th>Office Location</th>
+                <th>OS & Version</th>
+                <th>Real-time</th>
+                <th>Ransomware</th>
+                <th>Last Heartbeat</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="endpoints-table-body">
+              <tr><td colspan="9" class="empty-state">Loading registered endpoints...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 3: THREATS -->
+      <section id="tab-threats" class="tab-content">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Incident ID</th>
+                <th>Time</th>
+                <th>Computer</th>
+                <th>Threat Name</th>
+                <th>Type</th>
+                <th>Severity</th>
+                <th>Confidence</th>
+                <th>Status</th>
+                <th>Target File / Path</th>
+              </tr>
+            </thead>
+            <tbody id="threats-table-body">
+              <tr><td colspan="9" class="empty-state">No incidents recorded.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: QUARANTINE -->
+      <section id="tab-quarantine" class="tab-content">
+        <div class="section-box">
+          <div class="box-header">
+            <h3>Central Quarantine Subsystem</h3>
+            <p class="subtitle">Threats neutralized with execution bits stripped & isolated in encrypted vault</p>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Quarantine ID</th>
+                  <th>Threat Name</th>
+                  <th>Original Path</th>
+                  <th>SHA-256</th>
+                  <th>Severity</th>
+                  <th>Quarantined At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="quarantine-table-body">
+                <tr><td colspan="7" class="empty-state">No files currently in quarantine vault.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: POLICIES -->
+      <section id="tab-policies" class="tab-content">
+        <div class="section-box">
+          <div class="box-header">
+            <h3>Centralized Fleet Policy Enforcement</h3>
+            <p class="subtitle">Settings pushed and cryptographically signed across all 50-100 endpoints</p>
+          </div>
+          <div class="policy-form">
+            <div class="form-row">
+              <label>
+                <input type="checkbox" id="policy-realtime" checked>
+                <span>Enable Real-time File System Monitoring</span>
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                <input type="checkbox" id="policy-ransomware" checked>
+                <span>Enable Ransomware Canary Honey-Files & Burst Process Termination</span>
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                <input type="checkbox" id="policy-usb-scan" checked>
+                <span>Automatic Removable Storage (USB) Scan on Insertion</span>
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                <input type="checkbox" id="policy-usb-block">
+                <span>Block Execution of Unsigned Binaries from Removable Drives</span>
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                <input type="checkbox" id="policy-web" checked>
+                <span>Enable C2 Network Reputation & Connection Auditing</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label for="policy-max-size">Maximum File Scan Size (MB)</label>
+              <input type="number" id="policy-max-size" value="100" min="10" max="1000">
+            </div>
+            <div class="form-group">
+              <label for="policy-exclusions">Excluded Directories (one per line)</label>
+              <textarea id="policy-exclusions" rows="4">C:\ProgramData\AegisShield\quarantine_vault
+C:\ProgramData\AegisShield\logs</textarea>
+            </div>
+            <button class="btn btn-primary" onclick="savePolicy()">Deploy Signed Policy Update</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: AUDIT -->
+      <section id="tab-audit" class="tab-content">
+        <div class="section-box">
+          <div class="box-header">
+            <h3>Regulatory Compliance & Audit Reports</h3>
+            <button class="btn btn-secondary" onclick="exportComplianceReport()">Export Compliance JSON</button>
+          </div>
+          <div class="report-box">
+            <h4>Fleet Health & Verification Summary</h4>
+            <div id="compliance-summary-content">
+              Loading compliance state...
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
